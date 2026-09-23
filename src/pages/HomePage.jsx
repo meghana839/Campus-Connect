@@ -7,19 +7,20 @@ function HomePage({events,
     onDeleteEvent,
     onEditEvent,
     editingEvent,
-}){
+    onUpdateEvent,}){
     return(
         <>
         <Hero title="Discover what is happening in Campus"
         description="Find workshops,sports,activities,club Meeting,and opportunities to connect with other students."/>
         <EventForm 
         onAddEvent={onAddEvent}
-        editingEvent={editingEvent}/>
+        editingEvent={editingEvent}
+        onUpdateEvent={onUpdateEvent}/>
         <EventSection 
         events={events}
         onDeleteEvent={onDeleteEvent}
-        onEditEvent={onEditEvent}/>
-        
+        onEditEvent={onEditEvent}
+        />
         </>
     );
 }

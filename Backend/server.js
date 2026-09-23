@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
@@ -37,63 +39,81 @@ const initialEvents = [
   },
 ];
 
-app.get("/",(req,res)=>{
-    res.send("Backend is working");
-})
 
-app.get("/api/events",(req,res)=>{
-    res.json(initialEvents);
-})
-
-app.delete("/api/events/:id", (req,res)=>{
-    const eventId=Number(req.params.id);
-    const eventIndex=initialEvents.findIndex(function(event){
-        return event.id==event.id;
-    });
-
-    if(eventIndex === -1){
-        return res.status(404).json({
-            message:"Event Not Found"
-        });
-    }
-    initialEvents.splice(eventIndex, 1);
-
-    res.json({
-        message:"Event Deleted Successfully"
-    })
-})
-
-app.post("/api/events",(req, res)=>{
-    const newEvent = req.body;
-    initialEvents.push(newEvent);
-    res.json({
-        message: "Event Added Successfully",
-        event: newEvent
-    })
-})
-
-app.put("/api/events/:id",(req,res)=>{
-    const eventId=Number(req.params.id);
-    const eventIndex=initialEvents.findIndex(function(event){
-        return event.id==event.id;
-    });
-    if(eventIndex === -1){
-        return res.status(404).json({
-            message:"Event Not Found"
-        });
-    }
-    initialEvents[eventIndex] = {
-        ...initialEvents[eventIndex],
-        ...req.body
-    };
-    res.json({
-        message: "Event updated Successfully",
-        event: initialEvents[eventIndex]
-    });
-    
-
+// Test route
+app.get("/", (req, res) => {
+  res.send("Backend is working");
 });
 
-app.listen(5050,()=>{
-    console.log("Server is running on port 5050");
-})
+
+// GET all events
+app.get("/api/events", (req, res) => {
+  res.json(initialEvents);
+});
+
+
+// DELETE an event
+app.delete("/api/events/:id", (req, res) => {
+  const eventId = Number(req.params.id);
+
+  const eventIndex = initialEvents.findIndex(function (event) {
+    return event.id == eventId;
+  });
+
+  if (eventIndex === -1) {
+    return res.status(404).json({
+      message: "Event Not Found",
+    });
+  }
+
+  initialEvents.splice(eventIndex, 1);
+
+  res.json({
+    message: "Event Deleted Successfully",
+  });
+});
+
+
+// ADD a new event
+app.post("/api/events", (req, res) => {
+  const newEvent = req.body;
+
+  initialEvents.push(newEvent);
+
+  res.json({
+    message: "Event Added Successfully",
+    event: newEvent,
+  });
+});
+
+
+// UPDATE an existing event
+app.put("/api/events/:id", (req, res) => {
+  const eventId = Number(req.params.id);
+
+  const eventIndex = initialEvents.findIndex(function (event) {
+    return event.id == eventId;
+  });
+
+  if (eventIndex === -1) {
+    return res.status(404).json({
+      message: "Event Not Found",
+    });
+  }
+
+  initialEvents[eventIndex] = {
+    ...initialEvents[eventIndex],
+    ...req.body,
+  };
+
+  res.json({
+    message: "Event Updated Successfully",
+    event: initialEvents[eventIndex],
+  });
+});
+
+
+// Start server
+app.listen(5050, () => {
+  console.log("Server is running on port 5050");
+});

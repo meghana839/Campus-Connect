@@ -15,8 +15,8 @@ function EventCard({
     onDeleteEvent(id);
   }
 
-  function handleEditClick() {
-    onEditEvent(id);
+  function handleEditClick(){
+    onEditEvent(id)
   }
 
   return (
