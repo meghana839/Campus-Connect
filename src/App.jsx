@@ -28,11 +28,18 @@ function App() {
     }
 
     function handleDeleteEvent(eventId) {
-        const updatedEvents = events.filter(function (event) {
-            return event.id !== eventId;
-        });
+        fetch('http://localhost:5050/api/events/${eventId}',{
+            method: "DELETE"
 
-        setEvents(updatedEvents);
+        }).then(()=>response.json())
+        .then((data)=>{
+            console.log(data);
+            fetch("http://localhost:5050/api/events")
+            .then((response)=>response.json())
+            .then((data)=>{
+                setEvents(data);
+            });
+        });
     }
 
     return (
