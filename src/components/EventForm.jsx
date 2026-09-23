@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-function EventForm({ onAddEvent }) {
+function EventForm({ onAddEvent, editingEvent }) {
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -9,6 +9,25 @@ function EventForm({ onAddEvent }) {
     location: "",
     description: "",
   });
+
+  useEffect(function () {
+    if (editingEvent !== null) {
+      setFormData({
+        title: editingEvent.title,
+        category: editingEvent.category,
+        date: new Date(editingEvent.date)
+          .toISOString()
+          .split("T")[0],
+        time: new Date(
+          `1970-01-01 ${editingEvent.time}`
+        )
+          .toTimeString()
+          .slice(0, 5),
+        location: editingEvent.location,
+        description: editingEvent.description,
+      });
+    }
+  }, [editingEvent]);
 
   const [formError, setFormError] = useState("");
 
@@ -64,6 +83,8 @@ function EventForm({ onAddEvent }) {
   return (
     <section className="event-form-section">
       <p className="section-label">Create an Activity</p>
+
+      <h2>{editingEvent != null ? "Edit Campus Event" : "Add a New Campus Event"}</h2>
 
       <h2>Add a New Campus Event</h2>
 
@@ -148,10 +169,12 @@ function EventForm({ onAddEvent }) {
           />
         </div>
 
-        {formError !== "" && <p className="form-error">{formError}</p>}
+        {formError !== "" && (
+          <p className="form-error">{formError}</p>
+        )}
 
         <button className="submit-button" type="submit">
-          Add Event
+          {editingEvent!=null ? "Update Event" : "Add Event"}
         </button>
       </form>
     </section>

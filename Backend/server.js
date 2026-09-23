@@ -95,5 +95,5 @@ app.put("/api/events/:id",(req,res)=>{
 });
 
 app.listen(5050,()=>{
-    console.log("Server is running on port 5006");
+    console.log("Server is running on port 5050");
 })
