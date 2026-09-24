@@ -1,119 +1,78 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
-
+const mongoose=require("mongoose");
 const app = express();
+const dns = require("dns");
+const Event=require("./models/Event");
 
 app.use(cors());
 app.use(express.json());
+dns.setServers(['8.8.8.8']);
 
-const initialEvents = [
-  {
-    id: 1,
-    title: "MERN Stack Workshop",
-    category: "Technology",
-    date: "25 September 2026",
-    time: "10:00 AM",
-    location: "Computer Lab 1",
-    description:
-      "Learn the basics of MongoDB, Express, React, and Node.js through a practical workshop.",
-  },
-  {
-    id: 2,
-    title: "College Hackathon",
-    category: "Technology",
-    date: "28 September 2026",
-    time: "9:00 AM",
-    location: "Main Auditorium",
-    description:
-      "Form a team, solve a real problem, and present your solution to mentors.",
-  },
-  {
-    id: 3,
-    title: "Photography Club Meet",
-    category: "Club",
-    date: "30 September 2026",
-    time: "2:00 PM",
-    location: "Seminar Hall",
-    description:
-      "Meet fellow photography enthusiasts and learn basic composition techniques.",
-  },
-];
+mongoose.connect(process.env.MONGODB_URI)
+.then(()=>{
+    console.log("MongoDB Connected Successfully");
+}).catch((error)=>{
+    console.log("MongoDB Connection Error: ",error);
+})
 
+app.get("/", (req, res)=>{
+    res.send("Backend is working");
+})
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("Backend is working");
-});
+app.get("/api/events", async (req, res)=>{
+    const events=await Event.find();
+    res.json(events);
+})
 
+app.delete("/api/events/:id", async(req, res)=>{
+    const deletedEvent= await Event.findByIdAndDelete(
+        req.params.id
+    )
 
-// GET all events
-app.get("/api/events", (req, res) => {
-  res.json(initialEvents);
-});
+    if(!deletedEvent){
+        return res.status(404).json({
+            message:"Event Not Found!"
+        })
+        
+    }
 
+    res.json({
+        message: "Event Deleted Successfully"
+    })
+})
 
-// DELETE an event
-app.delete("/api/events/:id", (req, res) => {
-  const eventId = Number(req.params.id);
-
-  const eventIndex = initialEvents.findIndex(function (event) {
-    return event.id == eventId;
-  });
-
-  if (eventIndex === -1) {
-    return res.status(404).json({
-      message: "Event Not Found",
+app.post("/api/events", async (req, res)=>{
+    const newEvent = await Event.create(req.body);
+    res.json({
+        message: "Event Added Successfully!",
+        event: newEvent
     });
-  }
-
-  initialEvents.splice(eventIndex, 1);
-
-  res.json({
-    message: "Event Deleted Successfully",
-  });
 });
 
+app.put("/api/events/:id", async(req, res)=>{
+    const updatedEvent = await Event.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {new:true}
+    )
 
-// ADD a new event
-app.post("/api/events", (req, res) => {
-  const newEvent = req.body;
-
-  initialEvents.push(newEvent);
-
-  res.json({
-    message: "Event Added Successfully",
-    event: newEvent,
-  });
-});
+    if(!updatedEvent){
+        return res.status(404).json({
+            message:"Event Not Found!"
+        });
+    }
+    
 
 
-// UPDATE an existing event
-app.put("/api/events/:id", (req, res) => {
-  const eventId = Number(req.params.id);
-
-  const eventIndex = initialEvents.findIndex(function (event) {
-    return event.id == eventId;
-  });
-
-  if (eventIndex === -1) {
-    return res.status(404).json({
-      message: "Event Not Found",
+    res.json({
+        message:"Event Updated Successfully!",
+        event: updatedEvent
     });
-  }
-
-  initialEvents[eventIndex] = {
-    ...initialEvents[eventIndex],
-    ...req.body,
-  };
-
-  res.json({
-    message: "Event Updated Successfully",
-    event: initialEvents[eventIndex],
-  });
 });
 
-
-// Start server
-app.listen(5050, () => {
-  console.log("Server is running on port 5050");
-});
+app.listen(5050, ()=>{
+    console.log("Server is running on port 5050");
+})
